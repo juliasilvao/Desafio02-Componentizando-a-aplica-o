@@ -1,16 +1,7 @@
-import { useEffect, useState } from 'react';
-
-import { MovieCard } from '../components/MovieCard';
-
-import { api } from '../services/api';
-
-import '../styles/content.scss';
-
-interface GenreResponseProps {
-  id: number;
-  name: 'action' | 'comedy' | 'documentary' | 'drama' | 'horror' | 'family';
-  title: string;
-}
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
+import { MovieCard } from "./MovieCard";
+import {GenreResponseProps} from '../App'
 
 interface MovieProps {
   imdbID: string;
@@ -23,33 +14,30 @@ interface MovieProps {
   Runtime: string;
 }
 
-export function Content(props: number ) {
-  const [selectedGenreId, setSelectedGenreId] = useState(1);
+interface ContentProps {
+  selectedGenre: GenreResponseProps;
+}
 
+export function Content({selectedGenre}: ContentProps) {
   const [movies, setMovies] = useState<MovieProps[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<GenreResponseProps>({} as GenreResponseProps);
-
-  setSelectedGenreId(props)
 
   useEffect(() => {
-    api.get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`).then(response => {
+    console.log(selectedGenre);
+    api.get<MovieProps[]>(`movies/?Genre_id=${selectedGenre.id}`).then(response => {
       setMovies(response.data);
     });
-
-    api.get<GenreResponseProps>(`genres/${selectedGenreId}`).then(response => {
-      setSelectedGenre(response.data);
-    })
-  }, [selectedGenreId]);
+  }, [selectedGenre]);
 
   return (
     <div className="container">
       <header>
         <span className="category">Categoria:<span> {selectedGenre.title}</span></span>
       </header>
+
       <main>
         <div className="movies-list">
           {movies.map(movie => (
-            <MovieCard key={movie.imdbID} title={movie.Title} poster={movie.Poster} runtime={movie.Runtime} rating={movie.Ratings[0].Value} />
+            <MovieCard key ={movie.imdbID} title={movie.Title} poster={movie.Poster} runtime={movie.Runtime} rating={movie.Ratings[0].Value} />
           ))}
         </div>
       </main>
